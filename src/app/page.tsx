@@ -1,15 +1,31 @@
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from './page.module.css'
+"use client";
+import Image from "next/image";
+import { Inter } from "@next/font/google";
+import styles from "./page.module.css";
+// import { useRouter } from 'next/router' // 在page中是这个 而在app中是navigation
+import { useRouter } from 'next/navigation'; // useRouter only works in Client Components
 
-const inter = Inter({ subsets: ['latin'] })
+// import React, { useEffect } from "react";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+// const Home: React.FC {
+  const router = useRouter();
 
-  
+  // useEffect(() => {
+  //   console.log("初始化渲染!");
+  // });
+
+  const toNewPage = () => {
+    router.push("/file");
+  };
 
   return (
     <main className={styles.main}>
+      <div>
+        <button onClick={toNewPage}>点击</button>
+      </div>
       <div className={styles.description}>
         <p>
           Get started by editing&nbsp;
@@ -21,7 +37,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            By{' '}
+            By{" "}
             <Image
               src="/vercel.svg"
               alt="Vercel Logo"
@@ -90,5 +106,7 @@ export default function Home() {
         </a>
       </div>
     </main>
-  )
-}
+  );
+};
+
+// export default Home;

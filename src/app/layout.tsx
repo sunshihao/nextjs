@@ -1,6 +1,6 @@
 import './globals.css'
 
-// 全局性文件
+// 不是全局性文件是布局文件
 export default function RootLayout({
   children,
 }: {
@@ -13,7 +13,11 @@ export default function RootLayout({
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
       <head />
-      <body>{children}</body>
+      <body>
+        {children}
+        
+      </body>
+    
     </html>
   )
 }
