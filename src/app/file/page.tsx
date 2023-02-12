@@ -1,91 +1,42 @@
+"use client"
 import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from '../page.module.css' // 防止样式污染的特定性写法
+import React, { useState, useEffect } from 'react'
+import ReactDOM from 'react-dom'
 
-const inter = Inter({ subsets: ['latin'] })
+// Import React FilePond
+import { FilePond, registerPlugin } from 'react-filepond'
 
-export default function Home() {
+// Import FilePond styles
+import 'filepond/dist/filepond.min.css'
+
+// Import the Image EXIF Orientation and Image Preview plugins
+// Note: These need to be installed separately
+// `npm i filepond-plugin-image-preview filepond-plugin-image-exif-orientation --save`
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
+
+export default function File() {
+  const [files, setFiles] = useState([]);
+
+  useEffect(()=>{
+    console.log('files----', files);
+  },[files])
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <div className="App">
+      <FilePond
+        files={files}
+        onupdatefiles={setFiles}
+        allowMultiple={true}
+        allowReorder={true}
+        maxFiles={3}
+        server={null}
+        name="files" /* sets the file input name, it's filepond by default */
+        labelIdle='拖拽文件 & 或者 <span class="filepond--label-action">选择图片</span>'
+      />
+    </div>
   )
 }
