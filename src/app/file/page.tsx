@@ -1,7 +1,5 @@
 "use client"
-import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
-import ReactDOM from 'react-dom'
 
 // Import React FilePond
 import { FilePond, registerPlugin } from 'react-filepond'
@@ -15,6 +13,7 @@ import 'filepond/dist/filepond.min.css'
 import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+import { openDB } from "@/app/utils/minio"
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
@@ -23,6 +22,9 @@ export default function File() {
 
   useEffect(()=>{
     console.log('files----', files);
+
+    const minioDb = openDB('sssh');
+    // console.log('minioDb', minioDb)
   },[files])
 
   return (
@@ -32,6 +34,7 @@ export default function File() {
         onupdatefiles={setFiles}
         allowMultiple={true}
         allowReorder={true}
+        credits={false}
         maxFiles={3}
         server={null}
         name="files" /* sets the file input name, it's filepond by default */
