@@ -5,6 +5,13 @@ import styles from "./page.module.css";
 // import { useRouter } from 'next/router' // 在page中是这个 而在app中是navigation
 import { useRouter } from 'next/navigation'; // useRouter only works in Client Components
 
+
+import { Alert } from "flowbite-react";
+
+function MyPage() {
+  return <>123213<Alert color="info">Alert!</Alert></>;
+}
+
 // import React, { useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,6 +33,7 @@ export default function Home() {
       <div>
         <button onClick={toNewPage}>点击</button>
       </div>
+      <div>123123{MyPage()}</div>
       <div className={styles.description}>
         <p>
           Get started by editing&nbsp;
