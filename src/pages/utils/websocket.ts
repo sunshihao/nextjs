@@ -1,4 +1,5 @@
 /** 连接websocket */
+import { delChatList, addChatList } from "@/store/reducers";
 
 let socket: WebSocket;
 
@@ -36,7 +37,11 @@ export const initWebSocket = () => {
       clearInterval(timerInterval);
     }
   });
+};
 
+// 发送mess
+export const sendMessageBySock = (message: string) => {
+  socket?.send(message);
 };
 
 /** blob data to object */
@@ -46,9 +51,16 @@ function blobToObject(blob) {
   reader.onload = function () {
     try {
       const dataAsString = reader.result;
-      const dataAsObject = JSON.parse(dataAsString!); // 传入参数转义Object
+      const dataAsObject: UserChat = JSON.parse(dataAsString); // 传入参数转义Object'
 
-      return dataAsObject;
+      console.log('recver message', dataAsObject)
+
+      if(dataAsObject && dataAsObject.code === "200"){
+        addChatList(dataAsObject.content);
+      }else {
+
+      }
+
     } catch (e) {
       //TODO handle the exception
     }

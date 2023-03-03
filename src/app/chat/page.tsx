@@ -4,20 +4,23 @@ import React, { useEffect, useState } from "react";
 import { Stream } from "stream";
 import "./index.css";
 import { useSelector, useDispatch } from "react-redux";
-import { increment, decrement } from "@/store/reducers";
+import { addChatList, delChatList } from "@/store/reducers";
+import { initWebSocket, sendMessageBySock } from "@/pages/utils/websocket";
+import { connect } from 'react-redux'
 
-type UserChat = {
-  userName?: string;
-  userType?: string;
-  date?: string;
-  content?: string;
-};
 
 // 心跳检测间隔时间（毫秒）
 const HEARTBEAT_INTERVAL = 10000;
 
-export default function Chat() {
-  const counterValue = useSelector((state) => state.counter.value);
+const Chat =(props)=> {
+
+  console.log('propspropsprops', props)
+
+  const counterValue = useSelector((state) => {
+    console.log("useSelectoruseSelectoruseSelector", state);
+    return state?.chatList;
+  });
+
   const dispatch = useDispatch();
 
   // 输入框信息
@@ -46,109 +49,31 @@ export default function Chat() {
 
   const messageRef = React.createRef<T>(); // messageRef
 
-  /** 连接websocket */
-  const initWebSocket = () => {
-    /** blob data to object */
-    function blobToObject(blob: Stream) {
-      const reader = new FileReader();
+  // 发送信息
+  const sendMessageSub = (e) => {
+    addData();
+    console.log("eventevent", e);
+    e.preventDefault();
 
-      reader.onload = function () {
-        try {
-          const dataAsString = reader.result;
-          const dataAsObject = JSON.parse(dataAsString); // 传入参数转义Object
-
-          console.log("receive message: ", dataAsObject);
-
-          if (dataAsObject.code == "300") {
-            return;
-          } else if (dataAsObject.code != "200") {
-            alert("AI 回复失败!");
-            return;
-          }
-
-          // 数据合并
-          setChatList([...chatList, dataAsObject]);
-
-          // messageRef.scrollTop = messageRef.scrollHeight;
-        } catch (e) {
-          //TODO handle the exception
-        }
-      };
-
-      reader.readAsText(blob);
-    }
-
-    if (!socket) {
-      setSocket(new WebSocket("ws://localhost:8080"));
-    }
-    // connect socket
-    // const socket = new WebSocket("ws://localhost:8080");
-    // const socket = new WebSocket('ws://82.157.139.89:8080');
-    // const socket = new WebSocket('wss://dhc.ink/ws');
-
-    // 最近一次收到消息的时间
-    let lastMessageTime = Date.now();
-
-    if (timerInterval) {
-      clearInterval(timerInterval);
-    }
-
-    // 发送心跳包
-    function sendHeartbeat() {
-      if (Date.now() - lastMessageTime > HEARTBEAT_INTERVAL) {
-        socket?.send("heartbeat");
-      }
-    }
-
-    socket?.addEventListener("open", (event) => {
-      console.log("WebSocket connection established");
-
-      // 启动心跳检测定时器
-      setTimerInterval(setInterval(sendHeartbeat, HEARTBEAT_INTERVAL));
-    });
-
-    // receive message
-    socket?.addEventListener("message", (event) => {
-      blobToObject(event.data);
-    });
-
-    socket?.addEventListener("close", (event) => {
-      console.log("WebSocket connection closed");
-
-      // 清除心跳检测定时器
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
-    });
-
-    const messageForm = document.querySelector("#message-form")!;
-    const messageInput = document.querySelector("#message-input")!;
-  };
-
-  const sendMessage = (event) => {
-    event.preventDefault();
-    const message = messageInput?.value;
-
-    console.log("message_message", message);
+    console.log("message", message);
 
     if (message) {
-      socket?.send(message);
-      messageInput.value = "";
-    } else {
+      sendMessageBySock(message); // 发送后清空
+      setMessage(undefined)
     }
   };
 
+  const addData = ()=> {
+    addChatList({abs:1231})
+  }
+
   useEffect(() => {
+    // 初始化
     initWebSocket();
   }, []);
 
   return (
     <div id="chatBody">
-      <div>
-        <h1>Counter: {counterValue}</h1>
-        <button onClick={() => dispatch(increment())}>Increment</button>
-        <button onClick={() => dispatch(decrement())}>Decrement</button>
-      </div>
       <div className="content_area">
         <div className="message_title flex justify-between items-center">
           <div className="flex flex-row items-center">
@@ -211,7 +136,7 @@ export default function Chat() {
           </div>
         </div>
         {/* input area */}
-        <form className="input_area" onSubmit={sendMessage}>
+        <form className="input_area" onSubmit={sendMessageSub}>
           <button
             type="button"
             style={{ marginRight: "10px" }}
@@ -229,6 +154,9 @@ export default function Chat() {
             type="text"
             value={message}
             placeholder="请输入..."
+            onChange={(e) => {
+              setMessage(e.target.value);
+            }}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
           <button
@@ -249,3 +177,7 @@ export default function Chat() {
     </div>
   );
 }
+
+export default connect(
+  state => state,
+)(Chat)
