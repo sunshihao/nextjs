@@ -1,6 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
 import thunkMiddleware from 'redux-thunk'
-import rootReducer from './reducers'
+
+import {combineReducers} from "redux";
+
+import chatReducer from './reducers/chat'
+import userReducer from './reducers/user'
+
+const rootReducer = combineReducers({
+  chat: chatReducer,
+  user: userReducer
+});
 
 export const store = configureStore({
   reducer: rootReducer,

@@ -1,7 +1,27 @@
 /** 连接websocket */
-import { delChatList, addChatList } from "@/store/reducers";
+import { add_chat } from "@/store/reducers/chat";
+import { store } from "@/store/store";
 
-let socket: WebSocket;
+const socketInstance = (function () {
+  let socket: WebSocket; // 保持单例引用
+
+  function createInstance() {
+    // 创建单例对象
+    const obj = new WebSocket("ws://localhost:8080");
+    return obj;
+  }
+
+  return {
+    getInstance: function () {
+      if (!socket) {
+        socket = createInstance();
+      }
+      return socket;
+    },
+  };
+})();
+
+// let socket: WebSocket;
 
 // 心跳检测间隔时间（毫秒）
 const HEARTBEAT_INTERVAL = 10000;
@@ -10,9 +30,9 @@ let timerInterval: NodeJS.Timeout | undefined;
 
 // 初始怀
 export const initWebSocket = () => {
-  if (!socket) {
-    socket = new WebSocket("ws://localhost:8080");
-  }
+  console.log("iiiiiiiiiiiiiiiiiiii");
+
+  let socket = socketInstance.getInstance();
 
   if (timerInterval) {
     clearInterval(timerInterval);
@@ -37,11 +57,23 @@ export const initWebSocket = () => {
       clearInterval(timerInterval);
     }
   });
+
+  return socket; 
 };
 
 // 发送mess
 export const sendMessageBySock = (message: string) => {
-  socket?.send(message);
+  console.log("message", message);
+  if (socketInstance.getInstance()) {
+    socketInstance.getInstance()?.send(message);
+  }
+};
+
+// 关闭
+export const closeWebSocket = () => {
+  if (socketInstance.getInstance()) {
+    socketInstance.getInstance().close(1000, "用户主动断开连接");
+  }
 };
 
 /** blob data to object */
@@ -53,14 +85,11 @@ function blobToObject(blob) {
       const dataAsString = reader.result;
       const dataAsObject: UserChat = JSON.parse(dataAsString); // 传入参数转义Object'
 
-      console.log('recver message', dataAsObject)
+      console.log("recver message", dataAsObject);
 
-      if(dataAsObject && dataAsObject.code === "200"){
-        addChatList(dataAsObject.content);
-      }else {
-
+      if (dataAsObject && dataAsObject.code === "200") {
+        store.dispatch(add_chat(dataAsObject));
       }
-
     } catch (e) {
       //TODO handle the exception
     }
@@ -74,6 +103,6 @@ function sendHeartbeat() {
   // 最近一次收到消息的时间
   let lastMessageTime = Date.now();
   if (Date.now() - lastMessageTime > HEARTBEAT_INTERVAL) {
-    socket?.send("heartbeat");
+    socketInstance.getInstance()?.send("heartbeat");
   }
 }

@@ -9,3 +9,13 @@ type UserChat = {
   userType?: string;
   userName ?: string
 };
+
+type StoreType = {
+  chat ?: object,
+  user ?: object
+};
+
+type understr = string | undefined;
+
+
+
