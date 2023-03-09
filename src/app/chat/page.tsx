@@ -1,7 +1,7 @@
 "use client";
 import Imager from "next/image";
-import React, { useEffect, useState, useCallback } from "react";
-import "./index.css";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import io from "socket.io-client";
 import { useSelector, useDispatch } from "react-redux";
 import {
   initWebSocket,
@@ -9,39 +9,29 @@ import {
   sendMessageBySock,
 } from "@/pages/utils/websocket";
 import Useshinput from "@/components/input/index";
-
+import "./index.css";
 /**
  * AI Chat
  */
 const Chat = () => {
-  // const dispatch = useDispatch();
-
   // 输入框信息
-  const [message, setMessage] = useState();
+  const [message, setMessage] = useState<string | undefined>();
 
   // 语音输入
   const [voiceFlag, setVoiceFlag] = useState<boolean>(false);
 
-  const messageRef = React.createRef<T>(); // messageRef
-
-  const memoizedCallback = useCallback(
-    () => {
-      console.log('111')
-      const socket = initWebSocket();
-    },
-    [],
-  );
+  // 
+  const messagesEnd = useRef<HTMLDivElement>(null);
 
   // 进行数据性刷新时都会触发
   const counterValue = useSelector((state: StoreType) => {
     return state.chat;
   }) as UserChat[];
 
-  console.log("counterValue", counterValue);
+  // console.log("counterValue", counterValue); 疯狂监听store中的值变换 我也是无语 state的每次变化都会被触发
 
   // 发送信息
   const sendMessageSubmit = (e: { preventDefault: () => void }) => {
-    console.log("eeeeeeeee", e);
 
     e.preventDefault();
     if (message) {
@@ -50,16 +40,26 @@ const Chat = () => {
     }
   };
 
+  const scrollToBottom = () => {
+    console.log('messagesEnd', messagesEnd)
+    if (messagesEnd && messagesEnd.current) {
+
+      messagesEnd.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     // 初始化websocket
-    console.log("111");
-    // const socket = initWebSocket();
-    memoizedCallback
+    initWebSocket();
     return () => {
-      // socket.close(1000, "用户主动断开连接");
-      // closeWebSocket()
+      // closeWebSocket();
     };
   }, []);
+
+  useEffect(() => {
+    // 底部滚动效果
+    scrollToBottom();
+  }, [counterValue]);
 
   return (
     <div id="chatBody">
@@ -76,7 +76,7 @@ const Chat = () => {
             />
             <span>AI Chat</span>
           </div>
-          <button
+          {/* <button
             className="py-2.5 px-2.5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
             type="button"
             data-drawer-target="drawer-right-example"
@@ -91,9 +91,9 @@ const Chat = () => {
               alt="Picture of the author"
               style={{ width: "1em" }}
             />
-          </button>
+          </button> */}
         </div>
-        <div ref={messageRef} className="message_area">
+        <div className="message_area">
           <div className="chat-bubble-container">
             {Array.isArray(counterValue) &&
               counterValue.map((item, key) => {
@@ -124,6 +124,8 @@ const Chat = () => {
                 }
               })}
           </div>
+          <div style={{ clear: 'both', height: '1px', width: '100%' }} ref={messagesEnd}></div>
+
         </div>
         {/* input area */}
         <form className="input_area" onSubmit={sendMessageSubmit}>
@@ -142,9 +144,9 @@ const Chat = () => {
           </button>
           <Useshinput
             message={message}
-            onChange={(value: string):object => {
-              setMessage(value);
-            }}
+            onChange={(value) => 
+              setMessage(value)
+            }
           />
           <button
             type="submit"
@@ -164,9 +166,5 @@ const Chat = () => {
     </div>
   );
 };
-
-// export default connect(
-//   state => state,
-// )(Chat)
 
 export default Chat;
