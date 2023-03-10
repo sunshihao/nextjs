@@ -1,9 +1,66 @@
+"use client";
 import Imager from "next/image";
+import React, { useState } from "react";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation"; // useRouter only works in Client Components
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { userAuthSchema } from "@/lib/validations/auth";
+
 import "./index.css";
+
+type FormData = z.infer<typeof userAuthSchema>;
+
 /**
  * AI Chat
  */
 const Login = () => {
+  // 解决form的表单问题
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(userAuthSchema),
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // 输入框信息
+  // const [username, setUsername] = useState<string | undefined>();
+  // const [password, setPassword] = useState<string | undefined>();
+
+  const router = useRouter();
+
+  //
+  const loginSubmit = async (data: FormData) => {
+
+    setIsLoading(true)
+    console.log("datadatadatadata", data);
+    const { username, password } = data;
+
+    if (username && password) {
+      const res = await fetch(`http://127.0.0.1:5000/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        },
+        body: JSON.stringify(data)
+      });
+
+      setIsLoading(false)
+
+      console.log('resresresres', res)
+
+      // if (res && res.code === "200") {
+      //   // TODO 登录成功
+      //   router.push("/chat");
+      // }
+    }
+  };
+
   return (
     <div
       style={{ height: "100vh" }}
@@ -21,7 +78,10 @@ const Login = () => {
             }}
           ></div>
 
-          <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
+          <form
+            className="w-full px-6 py-8 md:px-8 lg:w-1/2"
+            onSubmit={handleSubmit(loginSubmit)}
+          >
             <div className="flex justify-center mx-auto">
               <Imager
                 className="w-auto h-7 sm:h-8"
@@ -82,22 +142,31 @@ const Login = () => {
             <div className="mt-4">
               <label
                 className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-                htmlFor="LoggingEmailAddress"
+                htmlFor="username"
               >
                 User
               </label>
-              <input
-                id="LoggingEmailAddress"
-                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-                type="email"
+              <Input
+                id="username"
+                placeholder="请输入用户名"
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect="off"
+                disabled={isLoading}
+                {...register("username")}
               />
+              {errors?.username && (
+                <p className="px-1 text-xs text-red-600">
+                  {errors.username.message}
+                </p>
+              )}
             </div>
 
             <div className="mt-4">
               <div className="flex justify-between">
                 <label
                   className="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-200"
-                  htmlFor="loggingPassword"
+                  htmlFor="password"
                 >
                   Password
                 </label>
@@ -108,16 +177,27 @@ const Login = () => {
                   Forget Password?
                 </a>
               </div>
-
-              <input
-                id="loggingPassword"
-                className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-                type="password"
+              <Input
+                id="password"
+                placeholder="请输入密码"
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect="off"
+                disabled={isLoading}
+                {...register("password")}
               />
+              {errors?.password && (
+                <p className="px-1 text-xs text-red-600">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <div className="mt-6">
-              <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-gray-800 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
+              <button
+                type="submit"
+                className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-gray-800 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
+              >
                 Sign In
               </button>
             </div>
@@ -134,7 +214,7 @@ const Login = () => {
 
               <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
             </div>
-          </div>
+          </form>
         </div>
       </main>
     </div>
