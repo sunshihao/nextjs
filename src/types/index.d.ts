@@ -21,5 +21,3 @@ type StoreType = {
   chat?: object;
   user?: object;
 };
-
-type understr = string | undefined;

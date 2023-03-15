@@ -1,6 +1,6 @@
 "use client";
 import Imager from "next/image";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback, ChangeEvent } from "react";
 import io from "socket.io-client";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -8,7 +8,7 @@ import {
   closeWebSocket,
   sendMessageBySock,
 } from "@/pages/utils/websocket";
-import Useshinput from "@/components/input/index";
+import { Input } from "@/components/ui/input";
 import "./index.css";
 /**
  * AI Chat
@@ -20,7 +20,7 @@ const Chat = () => {
   // 语音输入
   const [voiceFlag, setVoiceFlag] = useState<boolean>(false);
 
-  // 
+  //
   const messagesEnd = useRef<HTMLDivElement>(null);
 
   // 进行数据性刷新时都会触发
@@ -32,7 +32,6 @@ const Chat = () => {
 
   // 发送信息
   const sendMessageSubmit = (e: { preventDefault: () => void }) => {
-
     e.preventDefault();
     if (message) {
       sendMessageBySock(message); // 发送
@@ -41,10 +40,9 @@ const Chat = () => {
   };
 
   const scrollToBottom = () => {
-    console.log('messagesEnd', messagesEnd)
+    console.log("messagesEnd", messagesEnd);
     if (messagesEnd && messagesEnd.current) {
-
-      messagesEnd.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEnd.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -124,8 +122,10 @@ const Chat = () => {
                 }
               })}
           </div>
-          <div style={{ clear: 'both', height: '1px', width: '100%' }} ref={messagesEnd}></div>
-
+          <div
+            style={{ clear: "both", height: "1px", width: "100%" }}
+            ref={messagesEnd}
+          ></div>
         </div>
         {/* input area */}
         <form className="input_area" onSubmit={sendMessageSubmit}>
@@ -142,11 +142,9 @@ const Chat = () => {
               style={{ width: "2.2em" }}
             />
           </button>
-          <Useshinput
-            message={message}
-            onChange={(value) => 
-              setMessage(value)
-            }
+          <Input
+            value={message || ""}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
           />
           <button
             type="submit"

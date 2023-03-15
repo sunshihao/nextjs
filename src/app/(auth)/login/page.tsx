@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"; // useRouter only works in Client C
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { userAuthSchema } from "@/lib/validations/auth";
+import { toast } from "@/hooks/use-toast";
 
 import "./index.css";
 
@@ -35,36 +36,49 @@ const Login = () => {
 
   //
   const loginSubmit = async (data: FormData) => {
-
-    setIsLoading(true)
+    setIsLoading(true);
     console.log("datadatadatadata", data);
     const { username, password } = data;
 
     if (username && password) {
+      // 这个不着急封装 好用就行
       const res = await fetch(`http://127.0.0.1:5000/login`, {
         method: "POST",
+        mode: 'cors',
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
         },
-        body: JSON.stringify(data)
-      });
+        body: JSON.stringify(data),
+      }).then((res) => res.json()); // 输出成json
 
-      setIsLoading(false)
+      setIsLoading(false);
 
-      console.log('resresresres', res)
+      // console.log("resresresres", res);
 
-      // if (res && res.code === "200") {
-      //   // TODO 登录成功
-      //   router.push("/chat");
-      // }
+      if (!res?.success) {
+        // TODO 登录成功
+        // return toast({
+        //   title: "通知",
+        //   description: "登录成功",
+        //   variant: "destructive",
+        // });
+
+        router.push("/chat");
+
+      } else {
+        return toast({
+          title: "异常",
+          description: "登录失败",
+        });
+      }
     }
   };
 
   return (
     <div
-      style={{ height: "100vh" }}
       dir="ltr"
+      style={{ height:"100vh" }}
       className="flex items-center flex-1 w-full overflow-x-hidden min-h-full "
       data-new-gr-c-s-check-loaded="14.1100.0"
       data-gr-ext-installed=""
