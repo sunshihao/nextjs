@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { userAuthSchema } from "@/lib/validations/auth";
 import { toast } from "@/hooks/use-toast";
 
+import { encrypt } from "@/lib/utils"
+
 import "./index.css";
 
 type FormData = z.infer<typeof userAuthSchema>;
@@ -47,9 +49,10 @@ const Login = () => {
         mode: 'cors',
         credentials: 'include',
         headers: {
-          "Content-Type": "application/json",
+          // "Content-Type": "application/json",
+          "Content-Type": "text/html",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(encrypt(data)), // 称不上好的写法
       }).then((res) => res.json()); // 输出成json
 
       setIsLoading(false);
