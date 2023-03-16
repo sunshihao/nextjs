@@ -24,7 +24,7 @@ const key = AES.enc.Utf8.parse('0123456789ASDFGH'); //十六位十六进制数�
 const iv = AES.enc.Utf8.parse('ASDFGH0123456789'); //十六位十六进制数作为密钥偏移量
 
 // 加密
-export function encrypt(word: object) {
+export function encrypt(word: string) {
   const src = AES.enc.Utf8.parse(word);
   const encrypted = AES.AES.encrypt(src, key, { iv, mode: AES.mode.CBC, padding: AES.pad.Pkcs7 });
   return encrypted.ciphertext.toString().toUpperCase();

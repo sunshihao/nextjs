@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { userAuthSchema } from "@/lib/validations/auth";
 import { toast } from "@/hooks/use-toast";
+import { TailwindIndicator } from "@/components/tailwind-indicator"
 
 import { encrypt } from "@/lib/utils"
 
@@ -52,25 +53,23 @@ const Login = () => {
           // "Content-Type": "application/json",
           "Content-Type": "text/html",
         },
-        body: JSON.stringify(encrypt(data)), // 称不上好的写法
+        body: encrypt(JSON.stringify(data)), // 称不上好的写法
       }).then((res) => res.json()); // 输出成json
 
       setIsLoading(false);
 
-      // console.log("resresresres", res);
+      console.log("resresresres", res);
 
-      if (!res?.success) {
+      if (res && res.success) {
         // TODO 登录成功
-        // return toast({
-        //   title: "通知",
-        //   description: "登录成功",
-        //   variant: "destructive",
-        // });
-
+        toast({
+          title: "通知",
+          description: "登录成功"
+        });
         router.push("/chat");
 
       } else {
-        return toast({
+        toast({
           title: "异常",
           description: "登录失败",
         });
@@ -234,6 +233,7 @@ const Login = () => {
           </form>
         </div>
       </main>
+
     </div>
   );
 };
