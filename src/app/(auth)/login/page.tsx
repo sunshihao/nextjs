@@ -7,11 +7,8 @@ import { useRouter } from "next/navigation"; // useRouter only works in Client C
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { userAuthSchema } from "@/lib/validations/auth";
-import { toast } from "@/hooks/use-toast";
-import { TailwindIndicator } from "@/components/tailwind-indicator"
-
+import { toast } from 'react-toastify';
 import { encrypt } from "@/lib/utils"
-
 import "./index.css";
 
 type FormData = z.infer<typeof userAuthSchema>;
@@ -31,10 +28,6 @@ const Login = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // 输入框信息
-  // const [username, setUsername] = useState<string | undefined>();
-  // const [password, setPassword] = useState<string | undefined>();
-
   const router = useRouter();
 
   //
@@ -45,42 +38,42 @@ const Login = () => {
 
     if (username && password) {
       // 这个不着急封装 好用就行
-      const res = await fetch(`http://127.0.0.1:5000/login`, {
-        method: "POST",
-        mode: 'cors',
-        credentials: 'include',
-        headers: {
-          // "Content-Type": "application/json",
-          "Content-Type": "text/html",
-        },
-        body: encrypt(JSON.stringify(data)), // 称不上好的写法
-      }).then((res) => res.json()); // 输出成json
+      let res;
 
+      try {
+        res = await fetch(`http://127.0.0.1:5000/login`, {
+          method: "POST",
+          mode: 'cors',
+          credentials: 'include',
+          headers: {
+            // "Content-Type": "application/json",
+            "Content-Type": "text/html",
+          },
+          body: encrypt(JSON.stringify(data)), // 称不上好的写法
+        }).then((res) => res.json()); // 输出成json
+
+      } catch (error) {
+        toast.error("请求异常!");
+        setIsLoading(false);
+      }
       setIsLoading(false);
 
-      console.log("resresresres", res);
-
-      if (res && res.success) {
-        // TODO 登录成功
-        toast({
-          title: "通知",
-          description: "登录成功"
-        });
+      if (res && res.code === "200") {
+        toast.success("登录成功");
         router.push("/chat");
-
+      } else if (res.code === "500") {
+        toast.error(`请求异常!${res.message}`);
       } else {
-        toast({
-          title: "异常",
-          description: "登录失败",
-        });
+        toast.info(`登录未成功,${res.message}`);
       }
+
     }
   };
 
   return (
     <div
       dir="ltr"
-      style={{ height:"100vh" }}
+      style={{ height: "100vh" }}
       className="flex items-center flex-1 w-full overflow-x-hidden min-h-full "
       data-new-gr-c-s-check-loaded="14.1100.0"
       data-gr-ext-installed=""

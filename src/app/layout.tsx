@@ -3,7 +3,9 @@ import "./globals.css";
 import { store } from "@/store/store";
 import { Provider } from "react-redux";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
-import { Toaster } from "@/components/ui/toaster";
+// import { Toaster } from "@/components/ui/toaster";
+import { ToastContainer } from 'react-toastify'; // https://fkhadra.github.io/react-toastify/introduction/
+import 'react-toastify/dist/ReactToastify.css';
 
 // 布局文件
 export default function RootLayout({
@@ -20,7 +22,20 @@ export default function RootLayout({
       <head />
       <body >
         <Provider store={store}>{children}</Provider>
-        <Toaster />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        {/* Same as */}
+        <ToastContainer />
         <TailwindIndicator />
       </body>
     </html>
