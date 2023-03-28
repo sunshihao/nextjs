@@ -1,6 +1,12 @@
 "use client";
 import Imager from "next/image";
-import React, { useEffect, useState, useRef, useCallback, ChangeEvent } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  ChangeEvent,
+} from "react";
 import io from "socket.io-client";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -9,6 +15,7 @@ import {
   sendMessageBySock,
 } from "@/pages/utils/websocket";
 import { Input } from "@/components/ui/input";
+import { Modal, Button } from "flowbite-react";
 import "./index.css";
 /**
  * AI Chat
@@ -19,6 +26,9 @@ const Chat = () => {
 
   // 语音输入
   const [voiceFlag, setVoiceFlag] = useState<boolean>(false);
+
+  // 侧边抽屉
+  const [drawerFlag, setDrawerFlag] = useState<boolean>(false);
 
   //
   const messagesEnd = useRef<HTMLDivElement>(null);
@@ -61,6 +71,7 @@ const Chat = () => {
 
   return (
     <div id="chatBody">
+      {/* <Button color="success">12321</Button> */}
       <div className="content_area">
         <div className="message_title flex justify-between items-center">
           <div className="flex flex-row items-center">
@@ -74,22 +85,20 @@ const Chat = () => {
             />
             <span>AI Chat</span>
           </div>
-          {/* <button
-            className="py-2.5 px-2.5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          {/* 侧抽屉 */}
+          <button
+            className="p-1.5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
             type="button"
-            data-drawer-target="drawer-right-example"
-            data-drawer-show="drawer-right-example"
-            data-drawer-placement="right"
-            aria-controls="drawer-right-example"
+            onClick={() => setDrawerFlag(true)}
           >
             <Imager
               src="/theme.svg"
               width={2}
               height={2}
               alt="Picture of the author"
-              style={{ width: "1em" }}
+              style={{ width: "1em", height: "1em" }}
             />
-          </button> */}
+          </button>
         </div>
         <div className="message_area">
           <div className="chat-bubble-container">
@@ -144,7 +153,9 @@ const Chat = () => {
           </button>
           <Input
             value={message || ""}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setMessage(e.target.value)
+            }
           />
           <button
             type="submit"
@@ -161,6 +172,56 @@ const Chat = () => {
           </button>
         </form>
       </div>
+      {/* 侧边栏 */}
+      <Modal show={drawerFlag} onClose={() => setDrawerFlag(false)}>
+        <div
+          className="fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto transition-transform translate-x-full bg-white w-80 dark:bg-gray-800"
+          aria-labelledby="drawer-right-label"
+        >
+          <h5
+            id="drawer-right-label"
+            className="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400"
+          >
+            功能区
+          </h5>
+          <button
+            type="button"
+            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            onClick={() => setDrawerFlag(false)}
+          >
+            <Imager
+              src="/svg/cancel.svg"
+              width={10}
+              height={10}
+              alt=""
+              style={{ width: "1.5em" }}
+            />
+            <span className="sr-only">Close menu</span>
+          </button>
+
+          <div className="grid grid-cols-2 gap-4">
+            <a
+              href="#"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Get access
+              <svg
+                className="w-4 h-4 ml-2"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

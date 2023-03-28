@@ -2,6 +2,10 @@
 import "./globals.css";
 import { store } from "@/store/store";
 import { Provider } from "react-redux";
+
+import { Flowbite } from "flowbite-react";
+
+
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 // import { Toaster } from "@/components/ui/toaster";
 import { ToastContainer } from 'react-toastify'; // https://fkhadra.github.io/react-toastify/introduction/
@@ -21,7 +25,9 @@ export default function RootLayout({
       */}
       <head />
       <body >
-        <Provider store={store}>{children}</Provider>
+        <Provider store={store}>
+          <Flowbite>{children}</Flowbite>
+        </Provider>
         <ToastContainer
           position="top-right"
           autoClose={4000}
@@ -35,8 +41,8 @@ export default function RootLayout({
           theme="light"
         />
         {/* Same as */}
-        <ToastContainer />
-        <TailwindIndicator />
+        {/* <ToastContainer /> */}
+        {/* <TailwindIndicator /> */}
       </body>
     </html>
   );
